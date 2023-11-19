@@ -13,7 +13,7 @@ class LogModel {
   static async searchLogs(queryParams) {
     try {
       const mustClauses = [];
-
+  
       if (queryParams.startTime && queryParams.endTime) {
         mustClauses.push({
           range: {
@@ -28,12 +28,30 @@ class LogModel {
           term: { timestamp: queryParams.timestamp },
         });
       }
-
+  
       Object.keys(queryParams).forEach((key) => {
         if (!["startTime", "endTime", "timestamp"].includes(key)) {
-          mustClauses.push({ match: { [key]: queryParams[key] } });
+          if (queryParams[key] === "") {
+            // If the value is an empty string, skip this condition
+          } else {
+            const [nestedField, nestedKey] = key.split('.');
+            if (nestedField && nestedKey) {
+              mustClauses.push({
+                nested: {
+                  path: nestedField,
+                  query: {
+                    match: { [`${nestedField}.${nestedKey}`]: queryParams[key] },
+                  },
+                },
+              });
+            } else {
+              mustClauses.push({ match: { [key]: queryParams[key] } });
+            }
+          }
         }
       });
+      
+  
       const result = await esClient.search({
         index: "logs",
         body: {
@@ -44,6 +62,7 @@ class LogModel {
           },
         },
       });
+  
       return result.hits.hits;
     } catch (error) {
       console.error("Error in Elasticsearch search request:", error);
