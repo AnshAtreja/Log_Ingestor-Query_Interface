@@ -1,0 +1,3 @@
+backend_log_ingestor/node_modules/
+frontend_query_interface/
+backend_log_ingestor/http_ca.crt
