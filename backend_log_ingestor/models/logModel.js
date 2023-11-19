@@ -23,7 +23,29 @@ class LogModel {
             },
           },
         });
-      } else if (queryParams.timestamp) {
+      } else {
+        if (queryParams.startTime) {
+          mustClauses.push({
+            range: {
+              timestamp: {
+                gte: queryParams.startTime,
+              },
+            },
+          });
+        }
+  
+        if (queryParams.endTime) {
+          mustClauses.push({
+            range: {
+              timestamp: {
+                lte: queryParams.endTime,
+              },
+            },
+          });
+        }
+      }
+  
+      if (queryParams.timestamp) {
         mustClauses.push({
           term: { timestamp: queryParams.timestamp },
         });
@@ -34,26 +56,22 @@ class LogModel {
           if (queryParams[key] === "") {
             // If the value is an empty string, skip this condition
           } else {
-            const [nestedField, nestedKey] = key.split('.');
-            if (nestedField && nestedKey) {
-              mustClauses.push({
-                nested: {
-                  path: nestedField,
-                  query: {
-                    match: { [`${nestedField}.${nestedKey}`]: queryParams[key] },
-                  },
-                },
-              });
-            } else {
-              mustClauses.push({ match: { [key]: queryParams[key] } });
+            const keys = key.split('.');
+            let query = { match: { [key]: queryParams[key] } };
+  
+            if (keys.length > 1) {
+              // Handle nested fields
+              query = { nested: { path: keys[0], query: { match: { [key]: queryParams[key] } } } };
             }
+  
+            mustClauses.push(query);
           }
         }
       });
-      
   
       const result = await esClient.search({
         index: "logs",
+        size: 10000,
         body: {
           query: {
             bool: {
@@ -69,11 +87,12 @@ class LogModel {
       throw error;
     }
   }
-
+  
   static async fullTextSearch(searchText) {
     try {
       const result = await esClient.search({
         index: "logs",
+        size: 10000,
         body: {
           query: {
             query_string: {
