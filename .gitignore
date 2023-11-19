@@ -1,0 +1,4 @@
+backend_log_ingestor/node_modules/
+frontend_query_interface/
+backendLog_ingestor/.env
+backend_log_ingestor/https_ca.crt
