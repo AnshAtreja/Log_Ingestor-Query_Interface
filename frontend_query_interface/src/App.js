@@ -1,5 +1,5 @@
 // App.jsx
-import React, { useState } from 'react';
+import React from 'react';
 import Header from './components/Header';
 import LeftFilter from './components/LeftFilter';
 import RightResults from './components/RightResults';

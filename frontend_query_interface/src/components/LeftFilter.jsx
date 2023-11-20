@@ -9,6 +9,7 @@ const LeftFilters = () => {
     resourceId: '',
     traceId: '',
     spanId: '',
+    commit: '',
     // parentResourceId: '',
     startTime: '',
     endTime: ''
@@ -19,25 +20,20 @@ const LeftFilters = () => {
   const { updateResults } = useResults();
 
   useEffect(() => {
-    // This effect will run after the component renders
-    // Reset filter fields and search text after each render
     setFilters(initialFilters);
     setSearchText('');
-  }, [updateResults]); // This dependency ensures the effect runs when updateResults changes
+  }, [updateResults]); 
 
   const handleInputChange = (field, value) => {
     setFilters((prevFilters) => ({ ...prevFilters, [field]: value }));
   };
 
   const applyFilters = () => {
-    // Construct the query parameters based on the filled fields
     const queryParams = new URLSearchParams({ ...filters, text: searchText }).toString();
-
-    // Make the API call with the constructed query parameters
     axios
       .get(`http://localhost:3000/logs/search?${queryParams}`)
       .then((response) => {
-        updateResults(response.data); // Update the global results
+        updateResults(response.data);
       })
       .catch((error) => {
         console.error('Error applying filters:', error);
@@ -45,11 +41,10 @@ const LeftFilters = () => {
   };
 
   const handleSearch = () => {
-    // Make the API call for full-text search
     axios
       .get(`http://localhost:3000/logs/fulltext?text=${searchText}`)
       .then((response) => {
-        updateResults(response.data); // Update the global results
+        updateResults(response.data);
       })
       .catch((error) => {
         console.error('Error with full-text search:', error);
@@ -57,11 +52,10 @@ const LeftFilters = () => {
   };
 
   const handleReset = () => {
-    // Make the API call to reset filters
     axios
       .get(`http://localhost:3000/logs/search`)
       .then((response) => {
-        updateResults(response.data); // Update the global results
+        updateResults(response.data);
       })
       .catch((error) => {
         console.error('Error with filter reset:', error);
@@ -119,6 +113,16 @@ const LeftFilters = () => {
       className="form-control"
       value={filters.spanId}
       onChange={(e) => handleInputChange('spanId', e.target.value)}
+    />
+  </div>
+  <div className="form-group">
+    <label htmlFor="commit">Commit:</label>
+    <input
+      type="text"
+      id="commit"
+      className="form-control"
+      value={filters.commit}
+      onChange={(e) => handleInputChange('commit', e.target.value)}
     />
   </div>
   {/* <div className="form-group">

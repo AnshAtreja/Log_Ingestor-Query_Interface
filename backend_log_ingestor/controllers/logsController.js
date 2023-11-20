@@ -25,7 +25,6 @@ class LogsController {
   static async fullTextSearch(req, res) {
     try {
       const searchText = req.query.text;
-      console.log(searchText);
       const searchResults = await LogModel.fullTextSearch(searchText);
 
       res.json(searchResults);

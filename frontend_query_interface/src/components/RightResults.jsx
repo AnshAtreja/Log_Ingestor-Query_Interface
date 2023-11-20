@@ -36,6 +36,7 @@ const RightResults = () => {
               <th>Timestamp</th>
               <th>Trace ID</th>
               <th>Span ID</th>
+              <th>Commit</th>
               <th>Parent Resource ID</th>
             </tr>
           </thead>
@@ -48,6 +49,7 @@ const RightResults = () => {
                 <td>{log._source.timestamp}</td>
                 <td>{log._source.traceId}</td>
                 <td>{log._source.spanId}</td>
+                <td>{log._source.commit}</td>
                 <td>
                   {log._source.metadata &&
                     log._source.metadata.parentResourceId}
